@@ -12,3 +12,6 @@ and then the final discharging capacity at the end of the nth cycle along with t
 
 The curve in red represents the first cycle, and the curve in blue represents the final cycle, n, (3, 5, or 10). We evaluate the accuracy of the model for the different
 scenarios and also compare it to a single cycle (only one curve shown). 
+
+If you'd like to try out the Matlab scripts, you'd need to download the Toyota/MIT battery dataset from the source at:
+https://data.matr.io/1/projects/5c48dd2bc625d700019f3204
