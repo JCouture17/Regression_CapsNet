@@ -1,5 +1,5 @@
 # Reg_CapsNet
-Implementation of a regression capsule network for use in li-ion battery RUL
+Implementation of a regression capsule network for use in li-ion battery RUL prediction
 
 This repository was made for the paper: 'Novel Image-Based Rapid RUL Prediction for Li-Ion Battery using Capsule Network'
 Author: Jonathan Couture, OntarioTech University
