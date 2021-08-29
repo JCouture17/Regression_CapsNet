@@ -5,7 +5,6 @@ import pandas as pd
 from scipy import io
 
 class Functions:
-    
     def extract(self, filename, variable_name):
         C = io.loadmat(filename, mat_dtype=True)
         C = C[variable_name]

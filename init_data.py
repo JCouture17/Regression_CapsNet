@@ -40,15 +40,42 @@ def init_data(cycles, rgb, batch_size, resize):
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)   
         
-    data = io.imread('Dataset_' + cycles + '.tif')
-    labels = dt.load('RUL_' + cycles + '.mat', 'rul').astype(np.int16)
-    testData = io.imread('Test_' + cycles + '.tif')
-    testLabels = dt.load('rulTest_' + cycles + '.mat', 'rul').astype(np.int16)
+    data = io.imread('./Datasets/Data_' + cycles + '.tif')
+    labels = dt.load('./Datasets/rul_' + cycles + '.mat', 'rul').astype(np.int16)
+    testData = io.imread('./Datasets/Test_' + cycles + '.tif')
+    testLabels = dt.load('./Datasets/rulTest_' + cycles + '.mat', 'rul').astype(np.int16)
     
+    if cycles == '1':
+        bat1_end = 1152
+        bat2_end = 1945
+        bat3_end = 2728
+    elif cycles == '3':
+        bat1_end = 1148
+        bat2_end = 1937
+        bat3_end = 2716
+    elif cycles == '5':
+        bat1_end = 1144
+        bat2_end = 1929
+        bat3_end = 2704
+    elif cycles== '10':
+        bat1_end = 1134
+        bat2_end = 1909
+        bat3_end = 2674
+
     train_loader, test_loader = load_images(data, labels, batch_size=batch_size, resize=resize, test_size=0.2, rgb=rgb)
-    test_data, test_data1 = load_images(testData, testLabels, batch_size=batch_size, resize=resize, test_size=0.01, rgb=rgb)
-        
-    return train_loader, test_loader, test_data, args
+    
+    bat1 = load_images(testData[1:bat1_end], testLabels[1:bat1_end], batch_size=batch_size,\
+                             resize=resize, test_size = 0, rgb=rgb)
+    bat2 = load_images(testData[bat1_end + 1:bat2_end], testLabels[bat1_end + 1:bat2_end], batch_size=batch_size,\
+                             resize=resize, test_size = 0, rgb=rgb)
+    bat3 = load_images(testData[bat2_end + 1:bat3_end], testLabels[bat2_end + 1:bat3_end], batch_size=batch_size,\
+                             resize=resize, test_size = 0, rgb=rgb)
+    bat4 = load_images(testData[bat3_end + 1:-1], testLabels[bat3_end + 1:-1], batch_size=batch_size,\
+                             resize=resize, test_size = 0, rgb=rgb)
+    
+    testingData = {'bat1':bat1, 'bat2':bat2, 'bat3':bat3, 'bat4':bat4}
+
+    return train_loader, test_loader, testingData, args
 
     
         

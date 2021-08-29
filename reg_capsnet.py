@@ -1,7 +1,9 @@
-# Capsule network architecture for RUL prediction
-
 '''
-License approval ?
+For use in the paper: Novel Image-Based Rapid RUL Prediction for Li-Ion Battery using Capsule Network
+Author: Jonathan Couture, OntarioTech University
+email: jonathan.couture@ontariotechu.net
+
+    If you use this code for publishing, modified or not, please cite the abovementionned paper
 '''
 
 from CapsuleLayers import DenseCapsule, PrimaryCapsule
@@ -59,12 +61,10 @@ class CapsuleNet(nn.Module):
 def rmse_loss(y_true, y_pred):
     se = (torch.sub(y_true, y_pred))**2
     rmse = (((torch.sum(se) / len(y_true.data)))**0.5)
-    rmse = rmse/100 # Reducing this value to not explode the ReLU gradient
     return rmse
 
 def mae_loss(y_true, y_pred):
     mae = (torch.sum(torch.abs(torch.sub(y_true, y_pred)))) / len(y_true.data)
-    mae = mae/100
     return mae
 
 def test(model, test_loader, args):
@@ -112,7 +112,7 @@ def train(model, train_loader, test_loader, test_data, args, epochs, early_stop=
         val_loss, val_acc, mae, rmse = test(model, test_loader, args)
         logwriter.writerow(dict(epoch=epoch, loss=training_loss / len(train_loader.dataset),
                                 val_loss=val_loss, val_acc=val_acc))
-        print("==> Epoch %02d: loss=%.5f, val_loss=%.5f, val_acc=%.4f, \n MAE=%.4f RMSE=%.4f time=%ds"
+        print("==> Epoch %02d: loss=%.5f, val_loss=%.5f, \n val_acc=%.4f, MAE=%.4f RMSE=%.4f time=%ds"
               % (epoch+1, training_loss / len(train_loader.dataset),
                  val_loss, val_acc, mae, rmse, time() - ti))
         if val_acc > best_val_acc:  # update best validation acc and save model
@@ -120,11 +120,26 @@ def train(model, train_loader, test_loader, test_data, args, epochs, early_stop=
         if mae < best_mae:
             best_mae = mae
             torch.save(model.state_dict(), args.save_dir + '/epoch%d.pkl' % epoch)
-        print("best val_acc is now %.4f with an MAE of %.4f" % (best_val_acc, best_mae))
         
-        test_loss, test_acc, test_mae, test_rmse = test(model, test_data, args)
-        print('cell test acc = %.4f, test loss = %.5f,\nmean absolute error = %.4f, rmse = %.4f'\
-          % (test_acc, test_loss, test_mae, test_rmse))
+            ## Testing accuracy for each cells throughout the epochs
+        mean_mae, mean_rmse = 0, 0
+        test_loss, test_acc, test_mae, test_rmse = test(model, test_data['bat1'], args)
+        print('cell 1 test acc = %.4f, mean absolute error = %.4f, rmse = %.4f'\
+          % (test_acc, test_mae, test_rmse))
+        mean_mae += test_mae; mean_rmse += test_rmse
+        test_loss, test_acc, test_mae, test_rmse = test(model, test_data['bat2'], args)
+        print('cell 2 test acc = %.4f, mean absolute error = %.4f, rmse = %.4f'\
+          % (test_acc, test_mae, test_rmse))
+        mean_mae += test_mae; mean_rmse += test_rmse
+        test_loss, test_acc, test_mae, test_rmse = test(model, test_data['bat3'], args)
+        print('cell 3 test acc = %.4f, mean absolute error = %.4f, rmse = %.4f'\
+          % (test_acc, test_mae, test_rmse))
+        mean_mae += test_mae; mean_rmse += test_rmse
+        test_loss, test_acc, test_mae, test_rmse = test(model, test_data['bat4'], args)
+        print('cell 4 test acc = %.4f, mean absolute error = %.4f, rmse = %.4f'\
+          % (test_acc, test_mae, test_rmse))
+        mean_mae += test_mae; mean_rmse += test_rmse
+        print('Average MAE = %.4f, Average RMSE = %.4f' % (mean_mae, mean_rmse))
 
         early_stopping(val_loss, model)
         if early_stopping.early_stop:
@@ -191,17 +206,17 @@ if __name__ == "__main__":
     batch_size = 4
     cycles = '1'
     rgb = 'n' 
-    early_stop = 2
-    lr = 0.0001
+    early_stop = 3
+    lr = 0.00005
 
-    train_data, val_data, test_data, args = init_data(cycles, rgb, batch_size, resize)
+    train_data, val_data, testingData, args = init_data(cycles, rgb, batch_size, resize)
     args.lr = lr
     
     # Creating the Capsule Network
     from torchinfo import summary
     model = CapsuleNet(input_size=[args.in_size, resize, resize], routings=3)
     
-        ## Transfer Learning ##
+    #     # Transfer Learning ##
     # model.load_state_dict(torch.load('./result/trained_model.pkl'))
     # for param in model.parameters(): # Deactivate training for all layers
     #     param.requires_grad = False
@@ -220,5 +235,5 @@ if __name__ == "__main__":
     print(summary(model, (batch_size, args.in_size, 128, 128))) # Print the summary of the neural network's architecture
 
     # Training and Testing
-    train(model, train_data, val_data, test_data, args, epochs=100, early_stop=early_stop)
+    train(model, train_data, val_data, testingData, args, epochs=1000, early_stop=early_stop)
 
