@@ -1,12 +1,13 @@
 '''
 For use in the paper: Novel Image-Based Rapid RUL Prediction for Li-Ion Battery using Capsule Network
 Author: Jonathan Couture, OntarioTech University
-email: jonathan.couture@ontariotechu.net
+E-mail: jonathan.couture@ontariotechu.net
+Date : August 29th 2021
 
-    If you use this code for publishing, modified or not, please cite the abovementionned paper
+    If you use this code, modified or not, please cite the abovementionned paper
 '''
 
-from CapsuleLayers import DenseCapsule, PrimaryCapsule
+from capsule_layers import DenseCapsule, PrimaryCapsule
 from init_data import init_data
 
 from torch import nn

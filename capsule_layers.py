@@ -2,6 +2,28 @@
 Some key layers used for constructing a Capsule Network. These layers can used to construct CapsNet on other dataset,
 not just on MNIST.
 Author: Xifeng Guo, E-mail: `guoxifeng1990@163.com`, Github: `https://github.com/XifengGuo/CapsNet-Pytorch`
+
+MIT License
+
+Copyright (c) 2017 Xifeng Guo
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 """
 
 import torch
@@ -23,17 +45,6 @@ def squash(inputs, axis=-1):
 
 
 class DenseCapsule(nn.Module):
-    """
-    The dense capsule layer. It is similar to Dense (FC) layer. Dense layer has `in_num` inputs, each is a scalar, the
-    output of the neuron from the former layer, and it has `out_num` output neurons. DenseCapsule just expands the
-    output of the neuron from scalar to vector. So its input size = [None, in_num_caps, in_dim_caps] and output size = \
-    [None, out_num_caps, out_dim_caps]. For Dense Layer, in_dim_caps = out_dim_caps = 1.
-    :param in_num_caps: number of cpasules inputted to this layer
-    :param in_dim_caps: dimension of input capsules
-    :param out_num_caps: number of capsules outputted from this layer
-    :param out_dim_caps: dimension of output capsules
-    :param routings: number of iterations for the routing algorithm
-    """
     def __init__(self, in_num_caps, in_dim_caps, out_num_caps, out_dim_caps, routings=3):
         super(DenseCapsule, self).__init__()
         self.in_num_caps = in_num_caps
@@ -79,7 +90,6 @@ class DenseCapsule(nn.Module):
                 # x_hat_detached.size=[batch, out_num_caps, in_num_caps, out_dim_caps]
                 # => b.size          =[batch, out_num_caps, in_num_caps]
                 b = b + torch.sum(outputs * x_hat_detached, dim=-1)
-
         return torch.squeeze(outputs, dim=-2)
 
 class PrimaryCapsule(nn.Module):
@@ -95,10 +105,8 @@ class PrimaryCapsule(nn.Module):
         super(PrimaryCapsule, self).__init__()
         self.dim_caps = dim_caps
         self.conv2d = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding, groups=in_channels) 
-        self.pointwise = nn.Conv2d(in_channels, out_channels, 1, 1, 0, 1, 1, bias=False)
 
     def forward(self, x):
         outputs = self.conv2d(x)
-        # outputs = self.pointwise(x)
         outputs = outputs.view(x.size(0), -1, self.dim_caps)
         return squash(outputs)
