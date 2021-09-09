@@ -1,9 +1,10 @@
 # Regression_CapsNet
 Implementation of a regression capsule network for use in li-ion battery RUL prediction
 
-This repository was made for the paper: 'Novel Image-Based Rapid RUL Prediction for Li-Ion Battery using Capsule Network'
+This repository was made for the paper: 'Novel Image-Based Rapid RUL Prediction for Li-Ion Battery using Capsule Network' (Not yet published, will update this citation in the future)
 Author: Jonathan Couture, OntarioTech University
-email: jonathan.couture@ontariotechu.net
+E-mail: jonathan.couture@ontariotechu.net
+Date: August 29th 2021
 
 In this I use the Toyota/MIT dataset to create various datasets representing consecutive data cycles shown to the network, and then train the network to predict
 the remaining useful life of the battery that it sees. The images were preprocessed and created using Matlab.
