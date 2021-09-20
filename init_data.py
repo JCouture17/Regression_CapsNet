@@ -31,14 +31,14 @@ def init_data(cycles, rgb, batch_size, resize):
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)    
 
-    if rgb == 'y':
-        args.in_size = 3
-    elif rgb == 'n':
-        args.in_size = 1  
-        
     args = parser.parse_args()
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)   
+        
+    if rgb == 'y':
+        args.in_size = 3
+    elif rgb == 'n':
+        args.in_size = 1 
         
     data = io.imread('./Datasets/Data_' + cycles + '.tif')
     labels = dt.load('./Datasets/rul_' + cycles + '.mat', 'rul').astype(np.int16)
