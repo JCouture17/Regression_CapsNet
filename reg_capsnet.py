@@ -83,7 +83,7 @@ def test(model, test_loader):
     test_loss /= len(test_loader.dataset)
     return test_loss, mape, mae, rmse
 
-def train(model, train_loader, test_loader, test_data, args, epochs, early_stop=5):
+def train(model, train_loader, test_loader, args, epochs, early_stop=5):
     print('Begin Training' + '-'*70)
 
     t0 = time()
@@ -109,33 +109,6 @@ def train(model, train_loader, test_loader, test_data, args, epochs, early_stop=
         print("==> Epoch %02d: loss=%.5f, val_loss=%.5f, \n val_acc=%.4f, MAE=%.4f RMSE=%.4f time=%ds"
               % (epoch+1, training_loss / len(train_loader.dataset),
                   val_loss, val_acc, mae, rmse, time() - ti))
-        
-        # Testing accuracy for each cells throughout the epochs
-        mean_mae, mean_rmse = 0, 0
-        test_loss, test_acc, test_mae, test_rmse = test(model, test_data['bat1'])
-        print('cell 1 test acc = %.4f, mae = %.4f, rmse = %.4f'\
-          % (test_acc, test_mae, test_rmse))
-        mean_mae += test_mae; mean_rmse += test_rmse
-        test_loss, test_acc, test_mae, test_rmse = test(model, test_data['bat2'])
-        print('cell 2 test acc = %.4f, mae = %.4f, rmse = %.4f'\
-          % (test_acc, test_mae, test_rmse))
-        mean_mae += test_mae; mean_rmse += test_rmse
-        test_loss, test_acc, test_mae, test_rmse = test(model, test_data['bat3'])
-        print('cell 3 test acc = %.4f, mae = %.4f, rmse = %.4f'\
-          % (test_acc, test_mae, test_rmse))
-        mean_mae += test_mae; mean_rmse += test_rmse
-        test_loss, test_acc, test_mae, test_rmse = test(model, test_data['bat4'])
-        print('cell 4 test acc = %.4f, mae = %.4f, rmse = %.4f'\
-          % (test_acc, test_mae, test_rmse))
-        mean_mae += test_mae; mean_rmse += test_rmse
-        print('Average MAE = %.4f, Average RMSE = %.4f' % (mean_mae/4, mean_rmse/4))
-        if best_mae > mean_mae/4:
-            best_mae = mean_mae/4
-            mae_epoch = epoch + 1
-        if best_rmse > mean_rmse/4:
-            best_rmse = mean_rmse/4
-            rmse_epoch = epoch + 1
-        print('best MAE is epoch %.2d and best RMSE is epoch %.2d' % (mae_epoch, rmse_epoch))
         
         early_stopping(val_loss, model)
         if early_stopping.early_stop:
@@ -189,6 +162,7 @@ class EarlyStopping:
 
 
 if __name__ == "__main__":
+    
     ''' These first parameters are user defined:
         - resize: parameter that dictates the input size of the images into the neural network. 
             NOTE: the size of the convolutional filters would need to be changed if the input size is altered.
@@ -203,7 +177,7 @@ if __name__ == "__main__":
     cycles = '1'
     rgb = 'y'
     transfer = 'y'
-    early_stop = 2
+    early_stop = 5
     lr = 1E-2
     
     train_data, val_data, testingData, args = init_data(cycles, rgb, batch_size, resize)  # Intializes the train/val/test sets
@@ -233,4 +207,5 @@ if __name__ == "__main__":
     print(summary(model, (batch_size, args.in_size, 128, 128)))  # Print the summary of the architecture
 
     # Training and Testing
-    train(model, train_data, val_data, testingData, args, epochs=100, early_stop=early_stop)
+    train(model, train_data, val_data, args, epochs=100, early_stop=early_stop)
+    test(model, testingData)
