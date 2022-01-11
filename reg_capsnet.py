@@ -172,16 +172,16 @@ if __name__ == "__main__":
         - transfer: whether or not to load in a network's state_space to make use of transfer learning ('y', 'n')
     '''
     
-    resize = 128
+    resize = 128 # Resize the images to this dimension (resize x resize)
     batch_size = 24
-    cycles = '1'
-    rgb = 'y'
-    transfer = 'y'
+    cycles = '1' # Choice of 1, 3, 5, and 10 cycle datasets
+    rgb = 'y' # Whether to include the 3 color channels per image or use Grayscale
+    transfer = 'y' # A trained model must be available to transfer
     early_stop = 5
     lr = 1E-2
     
     train_data, val_data, testingData, args = init_data(cycles, rgb, batch_size, resize)  # Intializes the train/val/test sets
-    args.lr = lr  # Redefining the learning rate with the previous user defined
+    args.lr = lr  # Redefining the learning rate with the previous user defined for ease of access
     
     # Creating the Capsule Network
     from torchinfo import summary
@@ -192,7 +192,7 @@ if __name__ == "__main__":
         model.load_state_dict(torch.load('./result/trained_model_39.pkl'))
         for param in model.parameters():  # Deactivate training for all layers
             param.requires_grad = False
-        decoder = nn.Sequential(  # Replace the final sequential layers
+        decoder = nn.Sequential(  # Replace the final sequential layers for re-training
             nn.Dropout(0.3), 
             nn.Linear(256*16, 512),
             nn.ReLU(),
@@ -204,7 +204,7 @@ if __name__ == "__main__":
         model.decoder = decoder
     
     model.cuda()  # Put model on GPU
-    print(summary(model, (batch_size, args.in_size, 128, 128)))  # Print the summary of the architecture
+    print(summary(model, (batch_size, args.in_size, resize, resize)))  # Print the summary of the architecture
 
     # Training and Testing
     train(model, train_data, val_data, args, epochs=100, early_stop=early_stop)

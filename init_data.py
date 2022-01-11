@@ -45,6 +45,7 @@ def init_data(cycles, rgb, batch_size, resize):
     testData = io.imread('./Datasets/Test_' + cycles + '.tif')
     testLabels = dt.load('./Datasets/rulTest_' + cycles + '.mat', 'rul').astype(np.int16)
     
+    # Seperating the 4 testing batteries
     if cycles == '1':
         bat1_end = 1152
         bat2_end = 1945
@@ -62,6 +63,7 @@ def init_data(cycles, rgb, batch_size, resize):
         bat2_end = 1909
         bat3_end = 2674
 
+    # Putting the training and testing data into DataLoaders
     train_loader, test_loader = load_images(data, labels, batch_size=batch_size, resize=resize, test_size=0.2, rgb=rgb)
     
     bat1 = load_images(testData[1:bat1_end], testLabels[1:bat1_end], batch_size=batch_size,\
@@ -73,6 +75,7 @@ def init_data(cycles, rgb, batch_size, resize):
     bat4 = load_images(testData[bat3_end + 1:-1], testLabels[bat3_end + 1:-1], batch_size=batch_size,\
                              resize=resize, test_size = 0, rgb=rgb)
     
+    # Combining the testing batteries into a single variable
     testingData = {'bat1':bat1, 'bat2':bat2, 'bat3':bat3, 'bat4':bat4}
 
     return train_loader, test_loader, testingData, args
